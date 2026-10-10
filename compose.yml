@@ -1,0 +1,12 @@
+
+name: notes-app
+
+services:
+  mobile-app:
+    container_name: my-mobile-container
+    build: .
+    ports:
+      - "8081:8081"
+    stdin_open: true
+    tty: true
+    restart: unless-stopped
