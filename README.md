@@ -2,6 +2,20 @@
 
 This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
 
+## Appwrite authentication setup
+
+The app uses Appwrite email/password authentication. In the Appwrite Console:
+
+1. Open **Auth > Settings > Providers** and enable **Email/Password**.
+2. Add an Android and/or iOS platform whose package or bundle ID exactly matches
+   `EXPO_PUBLIC_APPWRITE_PLATFORM` in `.env`.
+3. Keep the Notes table's **Row Security** enabled. Allow authenticated users to
+   create rows; the app assigns each created row's read, update, and delete
+   permissions to its owner.
+
+The app creates a session after signup and restores the current session on launch.
+No Appwrite API key belongs in the mobile app.
+
 ## Get started
 
 1. Install dependencies

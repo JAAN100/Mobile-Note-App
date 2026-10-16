@@ -1,24 +1,27 @@
-
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 import {
-    View,
-    Text,
-    StyleSheet,
-    TouchableOpacity,
     ActivityIndicator,
     Alert,
-} from 'react-native';
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
+} from "react-native";
 
-import NoteList from '../../../components/NoteList';
-import AddNoteModal from '../../../components/AddNoteModal';
-import { getMyNotes, createNote, deleteNote } from '../../../services/notes';
+import AddNoteModal from "../../../components/AddNoteModal";
+import NoteList from "../../../components/NoteList";
+import {
+    createNote,
+    deleteNote,
+    getMyNotes,
+    updateNote,
+} from "../../../services/notes";
 const NoteScreen = () => {
     const [notes, setNotes] = useState([]);
     const [modalVisible, setModalVisible] = useState(false);
-    const [newNote, setNewNote] = useState('');
+    const [newNote, setNewNote] = useState("");
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
-
     // Load saved notes from Appwrite
     useEffect(() => {
         const loadNotes = async () => {
@@ -26,10 +29,10 @@ const NoteScreen = () => {
                 const savedNotes = await getMyNotes();
                 setNotes(savedNotes);
             } catch (error) {
-                console.error('Load notes error:', error);
+                console.error("Load notes error:", error);
                 Alert.alert(
-                    'Unable to load notes',
-                    error.message || 'Please try again.'
+                    "Unable to load notes",
+                    error.message || "Please try again.",
                 );
             } finally {
                 setLoading(false);
@@ -50,52 +53,57 @@ const NoteScreen = () => {
 
             const savedNote = await createNote(text);
 
-            setNotes((previousNotes) => [
-                savedNote,
-                ...previousNotes,
-            ]);
+            setNotes((previousNotes) => [savedNote, ...previousNotes]);
 
-            setNewNote('');
+            setNewNote("");
             setModalVisible(false);
         } catch (error) {
-            console.error('Save note error:', error);
-            Alert.alert(
-                'Unable to save note',
-                error.message || 'Please try again.'
-            );
+            console.error("Save note error:", error);
+            Alert.alert("Unable to save note", error.message || "Please try again.");
         } finally {
             setSaving(false);
         }
     };
 
     const onDelete = (id) => {
-        Alert.alert(
-            "Delete Note",
-            "Are you sure you wanna delete this note?",
-            [
-                {
-                    text: "Cancel",
-                    style: "cancel",
+        Alert.alert("Delete Note", "Are you sure you wanna delete this note?", [
+            {
+                text: "Cancel",
+                style: "cancel",
+            },
+            {
+                text: "Delete",
+                style: "destructive",
+                onPress: async () => {
+                    try {
+                        const response = await deleteNote(id);
+                        setNotes(response);
+                    } catch (error) {
+                        Alert.alert("Error", error.message || "Failed to delete note.");
+                    }
                 },
-                {
-                    text: "Delete",
-                    style: "destructive",
-                    onPress: async () => {
-                        try {
-                            const response = await deleteNote(id);
-                            setNotes(response);
-                        } catch (error) {
-                            Alert.alert(
-                                "Error",
-                                error.message || "Failed to delete note."
-                            );
-                        }
-                    },
-                },
-            ]
-        );
+            },
+        ]);
     };
 
+    const onEdit = async (id, newText) => {
+        const text = newText.trim();
+
+        if (!text) {
+            Alert.alert("Error", "Note text cannot be empty.");
+            return;
+        }
+
+        try {
+            const response = await updateNote(id, text);
+            setNotes(response);
+        } catch (error) {
+            Alert.alert(
+                "Unable to update note",
+                error.message || "Please try again.",
+            );
+        }
+    };
 
     return (
         <View style={styles.container}>
@@ -108,7 +116,7 @@ const NoteScreen = () => {
                     </Text>
                 </View>
             ) : (
-                <NoteList notes={notes} onDelete={onDelete} />
+                <NoteList notes={notes} onDelete={onDelete} onEdit={onEdit} />
             )}
 
             <TouchableOpacity
@@ -135,31 +143,31 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         padding: 20,
-        backgroundColor: '#fff',
+        backgroundColor: "#fff",
     },
     addButton: {
-        position: 'absolute',
+        position: "absolute",
         bottom: 20,
         left: 20,
         right: 20,
-        backgroundColor: '#007bff',
+        backgroundColor: "#007bff",
         paddingVertical: 12,
         paddingHorizontal: 25,
         borderRadius: 8,
-        alignItems: 'center',
+        alignItems: "center",
     },
     addbuttonText: {
-        color: '#fff',
+        color: "#fff",
         fontSize: 18,
-        fontWeight: 'bold',
+        fontWeight: "bold",
     },
     emptyContainer: {
         flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
+        alignItems: "center",
+        justifyContent: "center",
     },
     emptyText: {
-        color: '#666',
+        color: "#666",
         fontSize: 16,
     },
 });

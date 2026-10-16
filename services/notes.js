@@ -5,20 +5,13 @@ const DATABASE_ID = process.env.EXPO_PUBLIC_APPWRITE_DB_ID;
 const TABLE_ID = process.env.EXPO_PUBLIC_APPWRITE_TABLE_ID;
 const TITLE_ATTRIBUTE = "Title";
 
-// There is no login screen yet, so make sure there is always a session.
-// Reuses an existing session, otherwise creates an anonymous one.
-let userPromise = null;
-const ensureUser = () => {
-  if (!userPromise) {
-    userPromise = account.get().catch(async () => {
-      await account.createAnonymousSession();
-      return account.get();
-    });
-    userPromise.catch(() => {
-      userPromise = null;
-    });
+// Throws if nobody is logged in. Sessions come from the auth service.
+const requireUser = async () => {
+  try {
+    return await account.get();
+  } catch {
+    throw new Error("Not logged in");
   }
-  return userPromise;
 };
 
 // Appwrite rows use `$id`; the UI components expect `id`.
@@ -29,7 +22,7 @@ const toNote = (row) => ({
 });
 
 export const getMyNotes = async () => {
-  await ensureUser();
+  await requireUser();
 
   const result = await tablesDB.listRows({
     databaseId: DATABASE_ID,
@@ -41,7 +34,7 @@ export const getMyNotes = async () => {
 };
 
 export const createNote = async (text) => {
-  const user = await ensureUser();
+  const user = await requireUser();
 
   const row = await tablesDB.createRow({
     databaseId: DATABASE_ID,
@@ -59,12 +52,25 @@ export const createNote = async (text) => {
 };
 
 export const deleteNote = async (id) => {
-  await ensureUser();
+  await requireUser();
 
   await tablesDB.deleteRow({
     databaseId: DATABASE_ID,
     tableId: TABLE_ID,
     rowId: id,
+  });
+
+  return await getMyNotes();
+};
+
+export const updateNote = async (id, title) => {
+  await requireUser();
+
+  await tablesDB.updateRow({
+    databaseId: DATABASE_ID,
+    tableId: TABLE_ID,
+    rowId: id,
+    data: { [TITLE_ATTRIBUTE]: title },
   });
 
   return await getMyNotes();

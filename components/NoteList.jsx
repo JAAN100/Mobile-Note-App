@@ -1,8 +1,7 @@
-import { Alert, FlatList } from "react-native";
-import { deleteNote } from "../services/notes";
+import { FlatList } from "react-native";
 import NoteItem from "./NoteItems";
 
-const NoteList = ({ notes, onDelete }) => {
+const NoteList = ({ notes, onDelete, onEdit }) => {
     return (
         <FlatList
             style={{ flex: 1 }}
@@ -10,7 +9,7 @@ const NoteList = ({ notes, onDelete }) => {
             contentContainerStyle={{ paddingBottom: 80 }}
             data={notes}
             keyExtractor={(item) => String(item.id ?? item.$id)}
-            renderItem={({ item }) => <NoteItem note={item} onDelete={onDelete} />}
+            renderItem={({ item }) => <NoteItem note={item} onDelete={onDelete} onEdit={onEdit} />}
         />
     );
 };

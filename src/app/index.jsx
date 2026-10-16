@@ -1,23 +1,30 @@
-import { Text, View, StyleSheet, Image, TouchableOpacity } from "react-native";
+import { ActivityIndicator, Image, Pressable, StyleSheet, Text, View } from "react-native";
 import { useRouter } from "expo-router";
-import postItImage from "@/assets/images/post-it.png"
+import postItImage from "@/assets/images/post-it.png";
+import { useAuth } from "../../context/authContext";
+
 const HomeScreen = () => {
+  const { user, loading } = useAuth();
   const router = useRouter();
+
+  if (loading) {
+    return <ActivityIndicator style={styles.loader} size="large" color="#007bff" />;
+  }
+
   return (
     <View style={styles.container}>
       <Image source={postItImage} style={styles.image}></Image>
       <Text style={styles.title}>Welcome to Notes App</Text>
       <Text style={styles.subTitle}>Capture your thoughts anytime anywhere.</Text>
-      <TouchableOpacity
+      <Pressable
         style={styles.button}
-        activeOpacity={0.8}
-        onPress={() => router.push("/notes")}
+        onPress={() => router.push(user ? "/notes" : "/auth/signin")}
       >
-        <Text style={styles.buttonText}>Get Started</Text>
-      </TouchableOpacity>
+        <Text style={styles.buttonText}>{user ? "My Notes" : "Get Started"}</Text>
+      </Pressable>
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -43,7 +50,7 @@ const styles = StyleSheet.create({
   subTitle: {
     fontSize: 16,
     color: "#666",
-    textAlign: 'center',
+    textAlign: "center",
     marginBottom: 20
   },
   button: {
@@ -57,7 +64,10 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 18,
     fontWeight: 'bold'
-  }
+  },
+  loader: {
+    flex: 1,
+  },
 });
 
 
