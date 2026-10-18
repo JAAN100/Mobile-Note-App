@@ -1,0 +1,29 @@
+{
+  "cli": {
+    "version": ">= 25.0.0",
+    "appVersionSource": "remote"
+  },
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal"
+    },
+    "preview": {
+      "distribution": "internal",
+      "android": { "buildType": "apk" },
+      "env": {
+        "EXPO_PUBLIC_APPWRITE_PROJECT_ID": "6ac8978c0022fc63a705",
+        "EXPO_PUBLIC_APPWRITE_ENDPOINT": "https://fra.cloud.appwrite.io/v1",
+        "EXPO_PUBLIC_APPWRITE_DB_ID": "6ac899a8002945932945",
+        "EXPO_PUBLIC_APPWRITE_TABLE_ID": "6ac899ee000724d931c5",
+        "EXPO_PUBLIC_APPWRITE_PLATFORM": "com.yourname.notesapp"
+      }
+    },
+    "production": {
+      "autoIncrement": true
+    }
+  },
+  "submit": {
+    "production": {}
+  }
+}
